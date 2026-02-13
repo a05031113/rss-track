@@ -1,0 +1,44 @@
+[project]
+name = "rss-track"
+version = "0.1.0"
+description = "RSS tracking agent that summarizes feeds and sends to Telegram via Claude Agent SDK"
+readme = "README.md"
+authors = [
+    { name = "a05031113", email = "a05031113@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "apscheduler>=3.11.2",
+    "claude-agent-sdk>=0.1.35",
+    "feedparser>=6.0.12",
+    "httpx>=0.28.1",
+    "python-dotenv>=1.2.1",
+    "pyyaml>=6.0.3",
+]
+
+[project.scripts]
+rss-track = "rss_track.main:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.19.1",
+    "pytest>=9.0.2",
+    "pytest-asyncio>=1.3.0",
+    "ruff>=0.15.1",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+ignore_missing_imports = true

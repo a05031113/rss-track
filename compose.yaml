@@ -1,0 +1,22 @@
+services:
+  rss-agent:
+    build: .
+    container_name: rss-telegram-agent
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      # RSS feed config (read-only)
+      - ./feeds.yaml:/app/feeds.yaml:ro
+      # SQLite persistent data
+      - agent-data:/app/data
+      # Claude Code auth (read-only, from host)
+      - ~/.config/claude-code/auth.json:/root/.config/claude-code/auth.json:ro
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  agent-data:

@@ -1,0 +1,14 @@
+.env
+.env.example
+data/
+__pycache__/
+*.pyc
+.git/
+.gitignore
+README.md
+.claude/
+.venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+task.md
