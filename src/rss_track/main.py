@@ -4,8 +4,6 @@ import argparse
 import asyncio
 import logging
 import signal
-import sys
-from pathlib import Path
 
 from rss_track.agent import RSSAgent
 from rss_track.config import AppConfig, load_config
@@ -45,51 +43,6 @@ async def run_once(config: AppConfig) -> None:
 
     state.close()
     logger.info("One-time check complete")
-
-
-# ---------------------------------------------------------------------------
-# --migrate: import feeds.yaml into SQLite
-# ---------------------------------------------------------------------------
-
-
-def run_migrate(config: AppConfig, feeds_path: str) -> None:
-    import yaml
-
-    feeds_file = Path(feeds_path)
-    if not feeds_file.exists():
-        logger.error("Feeds config not found: %s", feeds_file)
-        sys.exit(1)
-
-    with open(feeds_file, encoding="utf-8") as f:
-        raw = yaml.safe_load(f)
-
-    state = StateStore(config.db_path)
-    default_chat_id = config.telegram_chat_id
-    count = 0
-
-    for item in raw.get("feeds", []):
-        name = item["name"]
-        if state.get_feed_by_name(name):
-            logger.info("Feed '%s' already exists, skipping", name)
-            continue
-
-        chat_id = str(item.get("telegram_chat_id", "")) or default_chat_id
-        if not chat_id:
-            logger.warning("Feed '%s' has no chat_id, skipping", name)
-            continue
-
-        state.add_feed(
-            name=name,
-            url=item["url"],
-            chat_id=chat_id,
-            prompt=item["prompt"],
-            interval=item.get("check_interval_minutes", 60),
-            max_entries=item.get("max_entries_per_check", 10),
-        )
-        count += 1
-
-    state.close()
-    logger.info("Migrated %d feeds from %s to database", count, feeds_path)
 
 
 # ---------------------------------------------------------------------------
@@ -156,18 +109,12 @@ async def run_bot(config: AppConfig) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description="RSS Telegram Agent")
     parser.add_argument("--once", action="store_true", help="Check all feeds once and exit")
-    parser.add_argument("--migrate", action="store_true", help="Migrate feeds.yaml to database")
-    parser.add_argument(
-        "--config", default="feeds.yaml", help="Path to feeds.yaml (for --migrate)"
-    )
     args = parser.parse_args()
 
     config = load_config()
     _setup_logging(config.log_level)
 
-    if args.migrate:
-        run_migrate(config, args.config)
-    elif args.once:
+    if args.once:
         asyncio.run(run_once(config))
     else:
         asyncio.run(run_bot(config))

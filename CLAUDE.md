@@ -32,7 +32,6 @@ rss-track/
 ├── .dockerignore
 ├── Dockerfile
 ├── compose.yaml
-├── feeds.yaml          # Legacy, only used for --migrate
 ├── CLAUDE.md
 ├── README.md
 ├── task.md
@@ -101,7 +100,6 @@ async for msg in query(prompt="...", options=options):
 ```bash
 uv run rss-track              # Start bot + scheduler
 uv run rss-track --once       # Check all active feeds once (from DB) and exit
-uv run rss-track --migrate    # Migrate feeds.yaml to database (one-time)
 uv run ruff check src/        # Lint
 uv run mypy src/              # Type check
 ```
