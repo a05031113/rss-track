@@ -5,7 +5,6 @@ import os
 from dataclasses import dataclass, field
 from pathlib import Path
 
-import yaml
 from dotenv import load_dotenv
 
 logger = logging.getLogger(__name__)
@@ -27,11 +26,10 @@ class AppConfig:
     telegram_chat_id: str = ""
     log_level: str = "INFO"
     db_path: Path = field(default_factory=lambda: Path("data/state.db"))
-    feeds: list[FeedConfig] = field(default_factory=list)
 
 
-def load_config(feeds_path: str = "feeds.yaml") -> AppConfig:
-    """Load .env environment variables and feeds.yaml configuration."""
+def load_config() -> AppConfig:
+    """Load application configuration from environment variables / .env file."""
     load_dotenv()
 
     # Warn about API key billing
@@ -54,40 +52,9 @@ def load_config(feeds_path: str = "feeds.yaml") -> AppConfig:
     # Ensure db directory exists
     db_path.parent.mkdir(parents=True, exist_ok=True)
 
-    # Load feeds from YAML
-    feeds_file = Path(feeds_path)
-    if not feeds_file.exists():
-        raise FileNotFoundError(f"Feeds config not found: {feeds_file}")
-
-    with open(feeds_file, encoding="utf-8") as f:
-        raw = yaml.safe_load(f)
-
-    feeds: list[FeedConfig] = []
-    for item in raw.get("feeds", []):
-        chat_id = str(item.get("telegram_chat_id", "")) or default_chat_id
-        if not chat_id:
-            raise ValueError(
-                f"Feed '{item['name']}' has no telegram_chat_id and "
-                "TELEGRAM_CHAT_ID is not set in .env"
-            )
-        feeds.append(
-            FeedConfig(
-                name=item["name"],
-                url=item["url"],
-                telegram_chat_id=chat_id,
-                prompt=item["prompt"],
-                check_interval_minutes=item.get("check_interval_minutes", 60),
-                max_entries_per_check=item.get("max_entries_per_check", 10),
-            )
-        )
-
-    if not feeds:
-        logger.warning("No feeds configured in %s", feeds_path)
-
     return AppConfig(
         telegram_bot_token=telegram_token,
         telegram_chat_id=default_chat_id,
         log_level=log_level,
         db_path=db_path,
-        feeds=feeds,
     )
