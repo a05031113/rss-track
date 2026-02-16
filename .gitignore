@@ -12,6 +12,7 @@ wheels/
 # Environment
 .env
 feeds.yaml
+flight-prompt.md
 
 # Data
 data/

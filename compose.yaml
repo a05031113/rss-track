@@ -6,8 +6,6 @@ services:
     env_file:
       - .env
     volumes:
-      # RSS feed config (read-only)
-      - ./feeds.yaml:/app/feeds.yaml:ro
       # SQLite persistent data
       - agent-data:/app/data
       # Claude Code auth (read-only, from host)
