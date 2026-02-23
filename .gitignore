@@ -26,3 +26,6 @@ data/
 
 # Debug logs
 firebase-debug.log
+
+# Service logs
+logs/

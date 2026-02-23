@@ -102,9 +102,10 @@ class RSSAgent:
                     "Please run 'claude login' on the host machine.",
                     feed_name,
                 )
-            else:
-                logger.error("[%s] Agent SDK error: %s", feed_name, e)
-            return None
+                return None
+            logger.warning("[%s] Agent SDK error (may have partial result): %s", feed_name, e)
+            if not parts:
+                return None
 
         summary = "\n".join(parts).strip()
         if not summary or summary == "無相關內容":
