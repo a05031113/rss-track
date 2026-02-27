@@ -5,8 +5,6 @@ import os
 import shutil
 from typing import TYPE_CHECKING
 
-from claude_agent_sdk import AssistantMessage, ClaudeAgentOptions, TextBlock, query
-
 from rss_track.tools import fetch_rss_entries, send_to_telegram
 
 if TYPE_CHECKING:
@@ -80,6 +78,8 @@ class RSSAgent:
 
     async def _get_summary(self, feed_name: str, user_message: str) -> str | None:
         """Call Claude via Agent SDK to generate a summary. Returns None on error."""
+        from claude_agent_sdk import AssistantMessage, ClaudeAgentOptions, TextBlock, query
+
         options = ClaudeAgentOptions(
             system_prompt=SYSTEM_PROMPT,
             max_turns=3,

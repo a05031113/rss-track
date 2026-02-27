@@ -20,7 +20,7 @@ def _job_id(feed_id: str) -> str:
 
 
 def create_scheduler() -> AsyncIOScheduler:
-    return AsyncIOScheduler()
+    return AsyncIOScheduler(job_defaults={"misfire_grace_time": 600, "coalesce": True})
 
 
 async def _check_feed_wrapper(agent: RSSAgent, feed: FeedConfig) -> None:
